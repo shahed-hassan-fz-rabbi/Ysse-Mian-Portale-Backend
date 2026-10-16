@@ -98,7 +98,7 @@ CREATE INDEX IF NOT EXISTS idx_applications_candidate ON internship_applications
 CREATE INDEX IF NOT EXISTS idx_applications_opportunity ON internship_applications(opportunity_id);
 CREATE INDEX IF NOT EXISTS idx_applications_status ON internship_applications(status);
 
--- Updated_at trigger function
+-- Updated_at trigger
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -107,7 +107,6 @@ BEGIN
 END;
 $$ language 'plpgsql';
 
--- Apply updated_at trigger to all tables
 DO $$
 DECLARE
   t TEXT;
