@@ -20,7 +20,8 @@ const PORT = process.env.PORT || 3000
 // list (e.g. the deployed Vercel URL plus the localhost dev origin).
 const allowedOrigins = (process.env.FRONTEND_URL || "http://localhost:5173")
   .split(",")
-  .map((origin) => origin.trim())
+  // tolerate trailing slashes in copy-pasted values: "https://site.vercel.app/" == "https://site.vercel.app"
+  .map((origin) => origin.trim().replace(/\/+$/, ""))
   .filter(Boolean)
 
 app.use(
