@@ -20,6 +20,10 @@ import {
   adminUpdateApplicationStatusDetailed,
   adminGetAuditLogs,
 } from "../controllers/applicationReviewController.js"
+import {
+  adminGetContactMessages,
+  adminUpdateContactMessage,
+} from "../controllers/contactController.js"
 import { requireAuth, requireAdmin } from "../middleware/auth.js"
 import { validate } from "../middleware/validate.js"
 import { rateLimit } from "../middleware/rateLimit.js"
@@ -29,6 +33,7 @@ import {
   statusUpdateValidation,
   siteSettingsValidation,
   teamMemberValidation,
+  contactStatusValidation,
 } from "../validators/admin.js"
 
 const router = Router()
@@ -62,5 +67,16 @@ router.patch("/applications/:id/status", adminWriteLimiter, statusUpdateValidati
 
 // Audit Logs
 router.get("/audit-logs", adminGetAuditLogs)
+
+// Contact Messages
+router.get("/contact-messages", adminGetContactMessages)
+router.patch(
+  "/contact-messages/:id",
+  adminWriteLimiter,
+  uuidParam,
+  contactStatusValidation,
+  validate,
+  adminUpdateContactMessage,
+)
 
 export default router

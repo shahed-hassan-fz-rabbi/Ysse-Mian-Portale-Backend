@@ -1,0 +1,30 @@
+# Render Blueprint for the YSSE Express API.
+# Deploy: Render dashboard → New → Blueprint → connect THIS repository (main).
+# The React frontend lives in the separate Ysse-Mian-Portale-Frontend
+# repository and deploys to Vercel with its own vercel.json.
+
+services:
+  - type: web
+    name: ysse-api
+    runtime: node
+    # This repository IS the backend, so no rootDir is needed.
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Real values are entered in the Render dashboard (sync:false =
+      # never committed to this file). Get them from Supabase:
+      #   Project Settings → API → Project URL  → SUPABASE_URL
+      #   Project Settings → API → service_role secret → SUPABASE_SERVICE_ROLE_KEY
+      #   (server-only key — never use it in the frontend project)
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      # Exact deployed frontend origin (e.g. https://ysse-...vercel.app).
+      # Comma-separated list allowed — append http://localhost:5173 for
+      # post-deploy cross-checks if you want.
+      - key: FRONTEND_URL
+        sync: false

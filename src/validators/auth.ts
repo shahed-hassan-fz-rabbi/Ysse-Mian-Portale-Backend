@@ -60,6 +60,28 @@ export const updateProfileValidation = [
     .withMessage("Invalid phone number format"),
 ]
 
+export const contactValidation = [
+  body("name")
+    .trim()
+    .notEmpty()
+    .withMessage("Name is required")
+    .isLength({ max: 150 })
+    .withMessage("Name must be less than 150 characters"),
+  body("email").isEmail().withMessage("Valid email is required"),
+  body("subject")
+    .trim()
+    .notEmpty()
+    .withMessage("Subject is required")
+    .isLength({ max: 200 })
+    .withMessage("Subject must be less than 200 characters"),
+  body("message")
+    .trim()
+    .notEmpty()
+    .withMessage("Message is required")
+    .isLength({ max: 5000 })
+    .withMessage("Message must be less than 5000 characters"),
+]
+
 export const applicationValidation = [
   body("opportunity_id").isUUID().withMessage("Valid opportunity ID is required"),
   body("cover_letter")
@@ -67,6 +89,11 @@ export const applicationValidation = [
     .trim()
     .isLength({ max: 5000 })
     .withMessage("Cover letter must be less than 5000 characters"),
+  body("resume_url")
+    .optional({ nullable: true, checkFalsy: true })
+    .trim()
+    .isURL({ protocols: ["http", "https"] })
+    .withMessage("Resume link must be a valid URL"),
   body("skills")
     .trim()
     .notEmpty()

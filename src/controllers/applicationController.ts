@@ -1,13 +1,13 @@
 ﻿import { Request, Response } from "express"
 import supabase from "../config/supabase.js"
 
-// Get current user's applications
+// Get current user's applications (with the opportunity title for display)
 export async function getMyApplications(req: Request, res: Response) {
   const userId = (req as any).user.id
 
   const { data, error } = await supabase
     .from("internship_applications")
-    .select("*")
+    .select("*, internship_opportunities(title)")
     .eq("user_id", userId)
     .order("created_at", { ascending: false })
 
@@ -21,7 +21,7 @@ export async function getMyApplications(req: Request, res: Response) {
 // Submit a new application
 export async function submitApplication(req: Request, res: Response) {
   const userId = (req as any).user.id
-  const { opportunity_id, cover_letter, skills } = req.body
+  const { opportunity_id, cover_letter, resume_url, skills } = req.body
 
   // Check if opportunity exists and is published
   const { data: opportunity, error: oppError } = await supabase
@@ -33,6 +33,17 @@ export async function submitApplication(req: Request, res: Response) {
 
   if (oppError || !opportunity) {
     return res.status(404).json({ error: "Opportunity not found or not available" })
+  }
+
+  // Server-side deadline enforcement: published opportunities whose deadline
+  // has passed can no longer be applied to, no matter what the frontend sends
+  if (
+    opportunity.application_deadline &&
+    new Date(opportunity.application_deadline).getTime() < Date.now()
+  ) {
+    return res
+      .status(400)
+      .json({ error: "This opportunity closed on its application deadline" })
   }
 
   // Check for duplicate application
@@ -53,6 +64,7 @@ export async function submitApplication(req: Request, res: Response) {
       user_id: userId,
       opportunity_id,
       cover_letter: cover_letter || null,
+      resume_url: resume_url || null,
       skills,
       status: "submitted",
     })

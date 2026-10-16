@@ -6,6 +6,7 @@ import authRoutes from "./routes/auth.js"
 import contentRoutes from "./routes/content.js"
 import applicationRoutes from "./routes/applications.js"
 import adminRoutes from "./routes/admin.js"
+import contactRoutes from "./routes/contact.js"
 import { errorHandler } from "./middleware/errorHandler.js"
 import { notFoundHandler } from "./middleware/notFound.js"
 
@@ -15,9 +16,23 @@ const app = express()
 const PORT = process.env.PORT || 3000
 
 // Middleware
+// CORS allowlist. FRONTEND_URL accepts a single origin or a comma-separated
+// list (e.g. the deployed Vercel URL plus the localhost dev origin).
+const allowedOrigins = (process.env.FRONTEND_URL || "http://localhost:5173")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean)
+
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    origin: (origin, callback) => {
+      // Same-origin / server-to-server requests have no Origin header
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true)
+      } else {
+        callback(null, false)
+      }
+    },
     credentials: true,
   }),
 )
@@ -109,6 +124,7 @@ app.use("/api/auth", authRoutes)
 app.use("/api/content", contentRoutes)
 app.use("/api/applications", applicationRoutes)
 app.use("/api/admin", adminRoutes)
+app.use("/api/contact", contactRoutes)
 
 // Error handling
 app.use(notFoundHandler)

@@ -83,6 +83,12 @@ export const roleUpdateValidation = [
   body("role").isIn(["user", "admin"]).withMessage("Role must be user or admin"),
 ]
 
+// Contact message status change
+export const contactStatusValidation = [
+  param("id").matches(UUID).withMessage("Valid message ID is required"),
+  body("status").isIn(["new", "read", "archived"]).withMessage("Invalid message status"),
+]
+
 // Application status change
 export const statusUpdateValidation = [
   param("id").matches(UUID).withMessage("Valid application ID is required"),
